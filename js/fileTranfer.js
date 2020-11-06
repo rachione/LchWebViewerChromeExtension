@@ -73,8 +73,8 @@
                                             
                                             <button type='button' id='myActionBtnCancel' class='mybtn mybtn-danger'>Cancel</button>
                                             <button type='button' id='myActionBtnOK' class='mybtn mybtn-success'>Send</button>
-                                            <div class="custom-control custom-switch mySwitch">
-                                              <input type="checkbox" class="custom-control-input" id="isFolderSwitch">
+                                            <div id="FolderSwitch" >
+                                              <input type="checkbox" id="isFolderSwitch">
                                               <label class="custom-control-label" for="isFolderSwitch">Make Folder</label>
                                             </div>
                                         </div>      
