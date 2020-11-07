@@ -824,3 +824,12 @@
 .mybtn-none {
     display: none;
 }
+
+
+.twitterMainBtn {
+    display: flex;
+    -webkit-box-direction: normal;
+    -webkit-box-orient: horizontal;
+    flex-direction: row;
+
+}

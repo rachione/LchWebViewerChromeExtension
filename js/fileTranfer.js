@@ -1,4 +1,8 @@
 ﻿(function(w) {
+    $.fn.findSelf = function(selector) {
+        var result = this.find(selector).addBack().filter(selector)
+        return result;
+    };
     let TransferType = {
         url: 'url',
         base64: 'base64'
@@ -414,19 +418,17 @@
         }
         targetFunc() {
             let cls = this;
-            cls.addDownloadBtn(cls.findContainer(cls.mainQuery));
+            cls.addDownloadBtn(cls.findImgs(cls.mainQuery));
         }
         observeFunc($node) {
             let cls = this;
-            let $container = cls.findContainer($node)
-            if ($container.length !== 0) {
-                cls.addDownloadBtn($container);
-            } else if ($node.is(cls.imgQuery) && !$node.hasClass(cls.extendedImg)) {
-                cls.addDownloadBtn($node);
+            let $imgs = cls.findImgs($node)
+            if ($imgs.length !== 0) {
+                cls.addDownloadBtn($imgs);
             }
 
         }
-        findContainer(node) {
+        findImgs(node) {
             let cls = this;
             return $(node).find($(cls.imgQuery)).not(cls.extendedImgQuery)
 
@@ -490,7 +492,16 @@
 
             })
         }
+        observeFunc($node) {
+            let cls = this;
+            let $imgs = cls.findImgs($node)
+            if ($imgs.length !== 0) {
+                cls.addDownloadBtn($imgs);
+            } else if ($node.is(cls.imgQuery) && !$node.hasClass(cls.extendedImg)) {
+                cls.addDownloadBtn($node);
+            }
 
+        }
 
         observeInterrupt() {
             let cls = this;
@@ -611,16 +622,18 @@
         constructor(transferUI) {
             super(transferUI);
             this.mainQuery = `#react-root`;
-            this.imgQuery = `article > div div[data-testid='tweet'] ,
-                                ul[role="list"]>li[role="listitem"]`;
+            /*            this.imgQuery = `article > div div[data-testid='tweet'] ,
+                                            ul[role="list"]>li[role="listitem"]`;
+            */
+            this.imgQuery = `img`;
             this.tweetActionListQuery = `div[role='group']`;
             this.tweetParentsQuery = `article`;
             this.imgIndexQuery = `a[role='link']`;
 
-            this.subBtn = `<div style="float:right;text-align:right" class="ProfileTweet-action">
+            this.mainBtn = `<div  class="twitterMainBtn">
                                     <button type="button"  class="mybtn mybtn-warning twitter-btn-adjust" >download</button>
                                 </div>`;
-            this.mainBtn = `<button type="button"  class="mybtn mybtn-warning multipic-twitter-btn-adjust" >download</button>`;
+            this.subBtn = `<button type="button" class="mybtn mybtn-warning multipic-twitter-btn-adjust" >download</button>`;
         }
 
         collectFile(img) {
@@ -632,32 +645,58 @@
 
             para.url = url + ":orig"
             para.name = url.split('/').pop();
-
             return para;
 
         }
-        findContainer(node) {
+        findImgs(node) {
             let cls = this;
-            let $matches = $(node).find($(cls.imgQuery)).not(cls.extendedImgQuery)
+            let $imgs = $(node).find(cls.imgQuery).filter(function() {
+                var imgUrl = $(this).attr('src') || $(this).find('source').attr('src');
+                return imgUrl.includes("format=");
+            });
 
-            if ($matches.attr("data-testid")) {
-                return $matches.filter(function() {
-
-                    return $(this).find('> div').last().find('> div').last().find('> div').eq(1).children().length != 0
-                })
-
-            } else {
-                return $matches
-            }
-
+            return $imgs;
 
         }
 
-        addDownloadBtn($node) {
+        addDownloadBtn($imgs) {
             let cls = this;
 
-            $node.addClass(cls.extendedImg)
+            $imgs.addClass(cls.extendedImg)
                 .each(function() {
+                    let $img = $(this);
+                    let $parents = $img.closest(cls.tweetParentsQuery);
+                    let $btnContainer = $parents.find(cls.tweetActionListQuery)
+                    let imgData = [];
+                    let imgLink = cls.collectFile($img);
+                    //Already have extendBtn in container
+                    if ($btnContainer.find(".mybtn").length > 0) {
+                        var $btn = $btnContainer.find(".mybtn");
+                        imgData = JSON.parse($btn.attr("imgdata"));
+                        imgData.push(imgLink);
+                        $btn.attr("imgdata", JSON.stringify(imgData));
+
+
+                    } else {
+                        //First
+                        let $downloadBtn = $(cls.mainBtn);
+                        imgData.push(imgLink);
+                        $downloadBtn.findSelf(".mybtn").attr("imgdata", JSON.stringify(imgData));
+                        $downloadBtn
+                            .appendTo($btnContainer).findSelf(".mybtn").click(function() {
+                                var file = $(this).attr("imgdata");
+                                file = JSON.parse(file);
+                                cls.transferUI.setSendType(TransferType.url)
+                                cls.transferUI.setCollectedFiles(file)
+                                cls.transferUI.showMenuUI();
+                            })
+                    }
+
+
+
+
+
+                    /*
                     var $mediaOuterContainer = $(this);
                     var $parents = $mediaOuterContainer.closest(cls.tweetParentsQuery);
                     var downloadBtnContainer = $parents.find(cls.tweetActionListQuery)
@@ -708,6 +747,7 @@
                             cls.transferUI.showMenuUI();
 
                         });
+                        */
                 });
         }
     }
