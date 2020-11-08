@@ -484,7 +484,11 @@
                     url: `${self.parent.myHost.getHost()}/checkClient`,
                     data: JSON.stringify(data)
                 }, function(responseText) {
-                    def.resolve((responseText == 'true'));
+                    let resp = {}
+                    resp.isError = (responseText == null)
+                    resp.hasClient = (responseText == 'true')
+
+                    def.resolve(resp);
 
                 });
                 return def.promise();
@@ -866,8 +870,8 @@
                 var hostname = location.hostname;
                 switch (hostname) {
                     case "twitter.com":
-                        let hasClient = await self.myAPI.checkClient();
-                        if (!hasClient) {
+                        let resp = await self.myAPI.checkClient();
+                        if (!resp.isError && !resp.hasClient) {
                             await self.myAPI.recordClient();
                             callback();
                         }

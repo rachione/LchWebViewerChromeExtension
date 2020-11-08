@@ -74,10 +74,10 @@
                                         <div id='myRecentSets' class='scrollbar-default'></div>
                                         <hr class='myHR'>
                                         <div id='myActionBtn' class='GroupFloatRight'>
-                                            <div id="FolderSwitch" >
-                                              <input type="checkbox" id="isFolderSwitch">
-                                              <label class="custom-control-label" for="isFolderSwitch">Make Folder</label>
-                                            </div>
+                                            <label class="FolderSwitch">
+                                                <input id="isFolderSwitch" type="checkbox" /> Make Folder
+                                            </label>
+                                          
                                             <button type='button' id='myActionBtnOK' class='mybtn mybtn-success'>Send</button>
                                             <button type='button' id='myActionBtnCancel' class='mybtn mybtn-danger'>Cancel</button>
                                             
