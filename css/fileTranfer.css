@@ -807,29 +807,37 @@
     border-radius: 4px;
 }
 
-.pixiv-btn-adjust {
-
-    margin-right: 7px;
-    position: relative;
-    top: -2px;
+.pixivMainBtn {
+    margin-right: 10px;
 }
 
-.multipic-twitter-btn-adjust {
-    width: 80px;
-    margin: auto;
-    margin-top: 5px;
-
+.pixivSubBtn {
+    margin-right: 10px;
 }
+
+
 
 .mybtn-none {
     display: none;
 }
 
-
 .twitterMainBtn {
     display: flex;
-    -webkit-box-direction: normal;
-    -webkit-box-orient: horizontal;
-    flex-direction: row;
-
+    align-items: center;
 }
+
+/*
+.twitterSubBtn {
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.twitterSubBtn .mybtn {
+    opacity: 0.5;
+}
+
+.twitterSubBtn .mybtn:hover {
+    opacity: 1;
+}*/

@@ -473,8 +473,8 @@
             this.imgQuery = `main > section section:first,main > section div[role="presentation"] a img`
             this.subBtnContainerQuery = `div[role="presentation"]`
             this.removeInterruptUIQuery = `main > section div[role="presentation"] button:not(.mybtn)`
-            this.mainBtn = '<button type="button" class="mybtn mybtn-warning pixiv-btn-adjust-all" >download</button>';
-            this.subBtn = '<button type="button" style="float:right;" class="mybtn mybtn-warning pixiv-btn-adjust" >download</button>';
+            this.mainBtn = '<button type="button" class="mybtn mybtn-warning pixivMainBtn" >download</button>';
+            this.subBtn = '<button type="button" style="float:right;" class="mybtn mybtn-warning pixivSubBtn" >download</button>';
 
             this.imgData = []
             this.setCurrentUrl()
@@ -622,18 +622,13 @@
         constructor(transferUI) {
             super(transferUI);
             this.mainQuery = `#react-root`;
-            /*            this.imgQuery = `article > div div[data-testid='tweet'] ,
-                                            ul[role="list"]>li[role="listitem"]`;
-            */
+            this.vaildAreaQuery = `div[data-testid='primaryColumn'], div[aria-labelledby="modal-header"]`;
             this.imgQuery = `img`;
             this.tweetActionListQuery = `div[role='group']`;
-            this.tweetParentsQuery = `article`;
-            this.imgIndexQuery = `a[role='link']`;
-
-            this.mainBtn = `<div  class="twitterMainBtn">
-                                    <button type="button"  class="mybtn mybtn-warning twitter-btn-adjust" >download</button>
-                                </div>`;
-            this.subBtn = `<button type="button" class="mybtn mybtn-warning multipic-twitter-btn-adjust" >download</button>`;
+            this.tweetQuery = `article`;
+            this.subBtnParentQuery = `div[aria-labelledby="modal-header"]`
+            this.mainBtn = `<div class="twitterMainBtn"><button type="button" class=" mybtn mybtn-warning" >download</button></div>`;
+            this.subBtn = `<div class="twitterSubBtn"><button type="button" class="mybtn mybtn-warning" >download</button></div>`;
         }
 
         collectFile(img) {
@@ -652,7 +647,7 @@
             let cls = this;
             let $imgs = $(node).find(cls.imgQuery).filter(function() {
                 var imgUrl = $(this).attr('src') || $(this).find('source').attr('src');
-                return imgUrl.includes("format=");
+                return imgUrl.includes("format=") && $(this).parents(cls.vaildAreaQuery).length;
             });
 
             return $imgs;
@@ -665,10 +660,16 @@
             $imgs.addClass(cls.extendedImg)
                 .each(function() {
                     let $img = $(this);
-                    let $parents = $img.closest(cls.tweetParentsQuery);
-                    let $btnContainer = $parents.find(cls.tweetActionListQuery)
                     let imgData = [];
                     let imgLink = cls.collectFile($img);
+                    let $downloadBtn = $(cls.mainBtn); //main btn as default
+                    let $btnContainer = $img.closest(cls.tweetQuery).find(cls.tweetActionListQuery)
+                    if ($btnContainer.length > 0) { //change btnContainer attribute
+                        $btnContainer.css("max-width", "100%");
+                    } else { //sub img
+                        $btnContainer = $img.parent().parent().parent().parent();
+                        $downloadBtn = $(cls.subBtn);
+                    }
                     //Already have extendBtn in container
                     if ($btnContainer.find(".mybtn").length > 0) {
                         var $btn = $btnContainer.find(".mybtn");
@@ -678,8 +679,6 @@
 
 
                     } else {
-                        //First
-                        let $downloadBtn = $(cls.mainBtn);
                         imgData.push(imgLink);
                         $downloadBtn.findSelf(".mybtn").attr("imgdata", JSON.stringify(imgData));
                         $downloadBtn
@@ -689,65 +688,10 @@
                                 cls.transferUI.setSendType(TransferType.url)
                                 cls.transferUI.setCollectedFiles(file)
                                 cls.transferUI.showMenuUI();
+                                event.stopPropagation(); // stop parents event
                             })
                     }
 
-
-
-
-
-                    /*
-                    var $mediaOuterContainer = $(this);
-                    var $parents = $mediaOuterContainer.closest(cls.tweetParentsQuery);
-                    var downloadBtnContainer = $parents.find(cls.tweetActionListQuery)
-
-                    var downloadBtn = cls.subBtn
-                    //mutiple picture pick one
-                    if ($mediaOuterContainer.attr('role') == "listitem") {
-                        downloadBtnContainer = $mediaOuterContainer;
-                        downloadBtn = cls.mainBtn;
-                    }
-                    $(downloadBtn)
-                        .appendTo(downloadBtnContainer)
-                        .click(function() {
-
-                            let $imgQuery = $(this).closest(cls.tweetParentsQuery).find(cls.extendedImgQuery);
-                            console.log($imgQuery)
-                            //mutiple picture pick one
-                            if ($(this).parents(cls.extendedImgQuery).length != 0) {
-                                $imgQuery = $(this).closest(cls.extendedImgQuery);
-
-                            }
-                            let $imgs = $imgQuery.find('div > img[draggable="true"]')
-                            $imgs = $imgs.filter(function() {
-                                return !$(this).attr('src').includes("_bigger")
-                            })
-
-                            //sort by img herf index
-                            if ($imgs.length > 1) {
-                                $imgs.each(function() {
-                                    console.log($(this).closest(cls.imgIndexQuery))
-                                    let index = $(this).closest(cls.imgIndexQuery).attr('href').split('/').pop()
-                                    $(this).attr('index', index)
-                                })
-
-                                $imgs.sort(function(a, b) {
-                                    let aIndex = parseInt($(a).attr('index'))
-                                    let bIndex = parseInt($(b).attr('index'))
-                                    return aIndex - bIndex
-                                })
-                            }
-
-
-                            let file = $imgs.map(function() {
-                                return cls.collectFile(this)
-                            }).toArray();
-                            cls.transferUI.setSendType(TransferType.url)
-                            cls.transferUI.setCollectedFiles(file)
-                            cls.transferUI.showMenuUI();
-
-                        });
-                        */
                 });
         }
     }
