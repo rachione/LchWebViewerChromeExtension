@@ -1,22 +1,22 @@
 ﻿let pictureSearch = {
     /*
     query: {
-    	tweets: ".js-stream-item",
-    	tweetText: ".js-tweet-text",
-    	user: ".account-group  .username b",
-    	fullname: ".FullNameGroup  .fullname",
-    	description: ".content .js-tweet-text-container .js-tweet-text",
-    	avatar: ".avatar",
-    	userLink: ".stream-item-header a.js-user-profile-link",
-    	tweetLink: ".twitter-timeline-link.u-hidden",
-    	imgContent: "div[class='css-1dbjc4n r-1udh08x']",
-    	retweetCount: '.ProfileTweet-action--retweet .ProfileTweet-actionCountForPresentation',
-    	favoriteCount: '.ProfileTweet-action--favorite .ProfileTweet-actionCountForPresentation',
-    	isFavorite: '.js-stream-tweet.favorited',
-    	isRetweet: '.js-stream-tweet.retweeted',
+        tweets: ".js-stream-item",
+        tweetText: ".js-tweet-text",
+        user: ".account-group  .username b",
+        fullname: ".FullNameGroup  .fullname",
+        description: ".content .js-tweet-text-container .js-tweet-text",
+        avatar: ".avatar",
+        userLink: ".stream-item-header a.js-user-profile-link",
+        tweetLink: ".twitter-timeline-link.u-hidden",
+        imgContent: "div[class='css-1dbjc4n r-1udh08x']",
+        retweetCount: '.ProfileTweet-action--retweet .ProfileTweet-actionCountForPresentation',
+        favoriteCount: '.ProfileTweet-action--favorite .ProfileTweet-actionCountForPresentation',
+        isFavorite: '.js-stream-tweet.favorited',
+        isRetweet: '.js-stream-tweet.retweeted',
 
-    	userId: "data-user-id",
-    	tweetId: "data-item-id",
+        userId: "data-user-id",
+        tweetId: "data-item-id",
 
 
     },*/
@@ -472,7 +472,7 @@
                 return def.promise();
 
             },
-            getClientIdentifications: function() {
+            checkClient: function() {
                 let self = this;
                 var data = {};
                 data = this.baseTool.addAuthenticationPassword(data);
@@ -481,37 +481,35 @@
                 chrome.runtime.sendMessage({
                     method: 'POST',
                     action: 'fetch',
-                    url: `${self.parent.myHost.getHost()}/getClientIdentifications`,
+                    url: `${self.parent.myHost.getHost()}/checkClient`,
                     data: JSON.stringify(data)
                 }, function(responseText) {
-                    resObj = JSON.parse(responseText);
-                    def.resolve(resObj);
-
-                });
-                return def.promise();
-
-            },
-            recordClientIdentification: function() {
-                let self = this;
-                var data = {};
-                data.clientIdentification = this.parent.clientIdentification;
-                data = this.baseTool.addAuthenticationPassword(data);
-
-                var def = $.Deferred();
-                chrome.runtime.sendMessage({
-                    method: 'POST',
-                    action: 'fetch',
-                    url: `${self.parent.myHost.getHost()}/recordClientIdentification`,
-                    data: JSON.stringify(data)
-                }, function(responseText) {
-
                     def.resolve((responseText == 'true'));
 
                 });
                 return def.promise();
 
             },
-            deleteClientIdentification: function() {
+            recordClient: function() {
+                let self = this;
+                var data = {};
+                data.clientIdentification = this.parent.clientIdentification;
+                data = this.baseTool.addAuthenticationPassword(data);
+
+                var def = $.Deferred();
+                chrome.runtime.sendMessage({
+                    method: 'POST',
+                    action: 'fetch',
+                    url: `${self.parent.myHost.getHost()}/recordClient`,
+                    data: JSON.stringify(data)
+                }, function(responseText) {
+                    def.resolve((responseText == 'true'));
+
+                });
+                return def.promise();
+
+            },
+            removeCilent: function() {
                 let self = this;
                 var data = {};
                 data.clientIdentification = this.parent.clientIdentification;
@@ -522,7 +520,7 @@
                 chrome.runtime.sendMessage({
                     method: 'POST',
                     action: 'fetch',
-                    url: `${self.parent.myHost.getHost()}/deleteClientIdentification`,
+                    url: `${self.parent.myHost.getHost()}/removeCilent`,
                     data: JSON.stringify(data)
                 }, function(responseText) {
 
@@ -753,72 +751,7 @@
                 return def.promise();
 
             },
-            /*
-            searchTweetsFunc: async function (resolve) {
-            	let self = this;
-            	let diffTweetCollects = [];
-            	let allTweetCollects = self.parent.allTweetCollects;
 
-
-
-            	let picSearchConfig = this.uiManager.config.get();
-            	let searchMemos = picSearchConfig.searchMemos.slice();
-            	for (var i = 0; i < searchMemos.length; i++) {
-            		let searchMemo = searchMemos[i];
-            		var searchCount = picSearchConfig.searchCount;
-            		await new Promise(resolve => {
-            			(async () => {
-
-            				searchMemo += ` filter:images AND -filter:retweets`
-
-
-            				let obj = await self.searchPicture(searchMemo, self.lastTimes[i], 0, searchCount);
-            				if (obj.since_id != null) {
-            					self.lastTimes[i] = obj.since_id;
-            				}
-            				if (obj.tweetCollects.length == 0) {
-            					resolve();
-            					return;
-            				}
-
-            				var diffTweets = obj.tweetCollects.filter(item => !allTweetCollects.some(other => item.tweetId === other.tweetId));
-            				if (diffTweets.length != 0) {
-            					diffTweetCollects = diffTweetCollects.concat(diffTweets);
-            				}
-            				resolve();
-            			})();
-            		});
-            		await self.pauseSystem()
-            	}
-
-            	console.log("endSearchProcess ")
-            	diffTweetCollects = diffTweetCollects.filter(self.baseTool.distinct(["tweetId"]));
-            	diffTweetCollects = diffTweetCollects.sort(function (a, b) {
-            		return a.tweetId > b.tweetId ? 1 : -1;
-            	});
-            	console.log(`Add ${diffTweetCollects.length} Tweets!`);
-
-
-            	for (var i = 0; i < diffTweetCollects.length; i++) {
-            		let tweet = diffTweetCollects[i];
-            		await new Promise(resolve =>
-            			imgContentManager.append(tweet, function () {
-            				resolve();
-            			}))
-            		await self.pauseSystem()
-            	}
-            	imgContentManager.drawAll();
-
-
-            	allTweetCollects = allTweetCollects.concat(diffTweetCollects)
-
-
-
-            	self.parent.allTweetCollects = allTweetCollects;
-
-            	resolve();
-            },
-            */
             searchTweetsInitVer2: async function() {
 
                 await this.myAPI.getPicSearchConfig();
@@ -867,95 +800,7 @@
 
 
             },
-            /*
-            searchTweetsInit: async function () {
-            	await this.myAPI.getPicSearchConfig();
-            	let hasTempData = await this.myAPI.getTempTweets();
 
-            	let self = this;
-            	let allTweetCollects = self.parent.allTweetCollects;
-
-
-
-
-
-
-            	if (!hasTempData) {
-            		let picSearchConfig = this.uiManager.config.get();
-            		let searchMemos = picSearchConfig.searchMemos.slice();
-            		for (var i = 0; i < searchMemos.length; i++) {
-            			let searchMemo = searchMemos[i];
-            			let searchMemoIndex = i + 1;
-            			let searchMemosLength = searchMemos.length;
-            			await new Promise(resolve => {
-            				(async () => {
-            					var max_id = 0;
-            					var firstDepth = picSearchConfig.firstDepth;
-            					var searchCount = picSearchConfig.searchCount;
-
-            					var count = 1;
-            					searchMemo += ` filter:images AND -filter:retweets`
-
-            					while (count <= firstDepth) {
-
-            					
-
-
-            						let objs = await self.searchPicture(searchMemo, 0, max_id, searchCount);
-            						if (objs.since_id != null && count == 1) {
-            							self.lastTimes[i] = objs.since_id;
-            						}
-            						
-            						if (objs.tweetCollects.length != 0) {
-            							allTweetCollects = allTweetCollects.concat(objs.tweetCollects);
-            						}
-            						self.processBar.execute(searchMemoIndex, searchMemosLength, count / firstDepth, 0, 80);
-            						max_id = objs.max_id;
-            						count++;
-
-            						await self.pauseSystem()
-            					}
-            					resolve();
-            				})();
-            			});
-            			await self.pauseSystem()
-            		}
-
-
-
-            		allTweetCollects = allTweetCollects.filter(self.baseTool.distinct(["tweetId"]));
-            		allTweetCollects = allTweetCollects.sort(function (a, b) {
-            			return a.tweetId > b.tweetId ? 1 : -1;
-            		});
-
-            	}
-
-
-            	let images_loaded = 0;
-            	for (var i = 0; i < allTweetCollects.length; i++) {
-            		let tweet = allTweetCollects[i];
-            		await new Promise(resolve =>
-            			imgContentManager.append(tweet, function () {
-
-            				images_loaded++;
-            				self.processBar.execute(images_loaded, allTweetCollects.length, 1, 0, 100);
-            				resolve();
-            			}))
-            		await self.pauseSystem()
-            	}
-
-
-
-
-            	self.parent.allTweetCollects = allTweetCollects;
-
-
-            	self.allReady();
-
-
-
-            },
-            */
             AllTweetCurrentLen: 0,
             saveCurrentLen: function() {
                 this.AllTweetCurrentLen = this.parent.allTweetCollects.length;
@@ -1015,49 +860,16 @@
                 }
 
             },
-            checkClientIdentification: async function(callback) {
+            checkClientInit: async function(callback) {
                 let self = this;
                 self.parent.myHost.set("localhost");
                 var hostname = location.hostname;
                 switch (hostname) {
                     case "twitter.com":
-                        let ClientIdentificationArray = await self.myAPI.getClientIdentifications();
-                        let canOpen = true;
-
-                        console.log(ClientIdentificationArray)
-                        if (ClientIdentificationArray != null) {
-                            await self.baseTool.asyncForEach(ClientIdentificationArray, async (element) => {
-                                let isOpen = await new Promise(resolve => {
-                                    chrome.runtime.sendMessage({
-                                        method: 'GET',
-                                        action: 'xhttp',
-                                        url: element,
-                                        data: null
-                                    }, function(responseText) {
-                                        resolve(responseText)
-
-                                    })
-                                })
-
-                                if (isOpen == "open") {
-                                    canOpen = false;
-                                }
-                            });
-
-                        }
-
-                        if (!canOpen) {
-                            return;
-                        }
-
-                        //set clientIdentification
-                        self.parent.clientIdentification = URL.createObjectURL(new Blob(["open"], {
-                            type: 'application/json'
-                        }));
-
-                        var openWindow = await self.myAPI.recordClientIdentification();
-                        if (openWindow) {
-                            callback()
+                        let hasClient = await self.myAPI.checkClient();
+                        if (!hasClient) {
+                            await self.myAPI.recordClient();
+                            callback();
                         }
 
                         break;
@@ -1450,43 +1262,43 @@
                                                         <div class="MediaContainer">
                                                             
                                                         </div>
-														<div class="GroupFloatLeft" >
-															
+                                                        <div class="GroupFloatLeft" >
+                                                            
 
-															<div id="myRetweetBtn" class="actionBtn">
-																<svg viewBox="0 0 24 24" class="myglyph">
-																	<g>
-																		${pictureSearch.glyphicon.retweet}
-																	</g>
-																</svg>
-																<span class="actionCount" >0</span>
-															</div>
-															<div id="myFavoriteBtn" class="actionBtn">
-																<svg viewBox="0 0 24 24" class="myglyph">
-																	<g>
-																		${pictureSearch.glyphicon.favorite}
-																	</g>
-																</svg>
-																<span class="actionCount" >0</span>
-															</div>
-														</div>
+                                                            <div id="myRetweetBtn" class="actionBtn">
+                                                                <svg viewBox="0 0 24 24" class="myglyph">
+                                                                    <g>
+                                                                        ${pictureSearch.glyphicon.retweet}
+                                                                    </g>
+                                                                </svg>
+                                                                <span class="actionCount" >0</span>
+                                                            </div>
+                                                            <div id="myFavoriteBtn" class="actionBtn">
+                                                                <svg viewBox="0 0 24 24" class="myglyph">
+                                                                    <g>
+                                                                        ${pictureSearch.glyphicon.favorite}
+                                                                    </g>
+                                                                </svg>
+                                                                <span class="actionCount" >0</span>
+                                                            </div>
+                                                        </div>
 
                                                         
                                                         
-														<div class="GroupFloatRight" >
-															<button type="button" class="DownloadImg mybtn mybtn-warning">download</button>
-															<button type="button" id="openTweetLink" class="mybtn mybtn-info">open</button>
+                                                        <div class="GroupFloatRight" >
+                                                            <button type="button" id="openTweetLink" class="mybtn mybtn-info">open</button>
+                                                            <button type="button" class="DownloadImg mybtn mybtn-warning">download</button>
                                                             <!--button type="button" id="MuteUserBtn" class="mybtn mybtn-danger">mute</button-->
                                                             
                                                         </div>
-													</div>
-													<div id="closeBtn" class="actionBtn">
-														<svg viewBox="0 0 24 24" class="myglyph">
-															<g>
-																${pictureSearch.glyphicon.close}
-															</g>
-														</svg>
-                                                	</div>
+                                                    </div>
+                                                    <div id="closeBtn" class="actionBtn">
+                                                        <svg viewBox="0 0 24 24" class="myglyph">
+                                                            <g>
+                                                                ${pictureSearch.glyphicon.close}
+                                                            </g>
+                                                        </svg>
+                                                    </div>
                                                     
                                                 </div>
                                                
@@ -1498,13 +1310,13 @@
                     $('body').eq(0).append(pictureSearchWindows);
                     var pictureSearchHeader = `<div id='pictureSearchHeader'>
                                                     <h3 >Picture Search&nbsp;
-														<div id="pictureSearchSettingBtn" class="actionBtn" >
-															<svg viewBox="0 0 24 24" class="myglyph">
-																<g>
-																	${pictureSearch.glyphicon.setting}
-																</g>
-															</svg>
-														</div>
+                                                        <div id="pictureSearchSettingBtn" class="actionBtn" >
+                                                            <svg viewBox="0 0 24 24" class="myglyph">
+                                                                <g>
+                                                                    ${pictureSearch.glyphicon.setting}
+                                                                </g>
+                                                            </svg>
+                                                        </div>
                                                     </h3> 
                                                 </div>`;
                     $('#pictureSearchWindows').append(pictureSearchHeader);
@@ -1521,34 +1333,29 @@
                     var pictureSearchSettingWindow = `<div id='pictureSearchSettingWindow'  >
                                                             <div id="pictureSearchSettingContainer">
                                                                 <div class="control-group">
-                                                                    <label class="t1-label control-label" >初検索割合</label>
-                                                                    <div class="controls">
+                                                                    <label class="control-label" >Inital Ratio</label>
                                                                     <input id="FirstCountRatio" maxlength="3" type="number">
-                                                                    </div>
-																</div>
-																<div class="control-group">
-                                                                    <label class="t1-label control-label" >検索深度</label>
-                                                                    <div class="controls">
+                                                                    
+                                                                </div>
+                                                                <div class="control-group">
+                                                                    <label class="control-label" >Depth</label>
                                                                     <input id="SearchCount" maxlength="3" type="number">
-                                                                    </div>
                                                                 </div>
                                                                 <div class="control-group">
-                                                                    <label class="t1-label control-label" >検索間隔</label>
-                                                                    <div class="controls">
+                                                                    <label class="control-label" >Interval</label>
                                                                     <input id="IntervalTime" maxlength="3" type="number">
-                                                                    </div>
+
                                                                 </div>
                                                                 <div class="control-group">
-                                                                    <label class="t1-label control-label" >検索メモ</label>
-                                                                    <div class="controls">
+                                                                    <label class="control-label" >Keywords</label>
                                                                     <ul id="searchMemos" ></ul> 
-                                                                    </div>
+                                                                    
                                                                 </div>
                                                             </div>
                                                             <hr class="myHR">
                                                             <div class="GroupFloatRight">
-                                                                <button type="button" id="pictureSearchBtnCancel" class="mybtn mybtn-danger">Cancel</button>
                                                                 <button type="button" id="pictureSearchBtnSave" class="mybtn mybtn-success">Save</button>
+                                                                <button type="button" id="pictureSearchBtnCancel" class="mybtn mybtn-danger">Cancel</button>
                                                             </div>
                                                         </div>`;
                     $('body').eq(0).append(pictureSearchSettingWindow);
@@ -1625,13 +1432,9 @@
                     $(window).on("beforeunload", { self: this }, function(event) {
                         let self = event.data.self;
 
-                        /*
-                        if (self.parent.canSaveTempTweets.get()) {
-                        	self.myAPI.setTempTweets();
-                        }*/
                         console.log("close");
                         URL.revokeObjectURL(self.parent.clientIdentification)
-                        self.myAPI.deleteClientIdentification();
+                        self.myAPI.removeCilent();
                     });
 
 
@@ -1681,13 +1484,13 @@
                 setUI: function() {
                     var setMemoHtml = function(content) {
                         return `<li class='memo'>
-							<span class='deleteMemo '>
-								<svg viewBox="0 0 24 24" class="myglyph">
-								<g>
-									${pictureSearch.glyphicon.close}
-								</g>
-								</svg>
-							</span>
+                            <span class='deleteMemo '>
+                                <svg viewBox="0 0 24 24" class="myglyph">
+                                <g>
+                                    ${pictureSearch.glyphicon.close}
+                                </g>
+                                </svg>
+                            </span>
                             <span class='content'>${content}</span>
                         </li>`
                     }
@@ -1738,7 +1541,7 @@
         this.content.init();
         $.fn.extend(this.content.jqueryExtent);
 
-        this.content.system.checkClientIdentification(function() {
+        this.content.system.checkClientInit(function() {
             self.initAllUI();
             self.searchTweetsInit();
         });

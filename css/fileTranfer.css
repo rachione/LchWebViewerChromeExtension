@@ -61,25 +61,34 @@
     top: 50%;
     transform: translate(-50%, -50%);
     border-radius: 4px;
+    font-family: Arial;
 
 }
 
-#pictureSearchSettingContainer {}
-
-#pictureSearchSettingWindow .controls>input {
-    width: 160px;
-    margin-bottom: 5px;
+#pictureSearchSettingContainer {
+    display: flex;
+    flex-direction: column;
 }
 
-#pictureSearchSettingWindow .controls {
-    margin-left: 100px;
-}
-
-#pictureSearchSettingWindow .control-label {
-    color: #66757f;
-    float: left;
-    width: 80px;
+.control-group {
+    display: flex;
+    align-items: center;
     padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.control-group input {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 2px;
+
+}
+
+.control-group .control-label {
+    color: #66757f;
+    width: 80px;
+    min-width: 80px;
+    padding-right: 10px;
     text-align: right;
     margin: 0;
     font-size: 14px;
@@ -88,9 +97,15 @@
 }
 
 
+
+
 #searchMemos {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
     padding-inline-start: 0px;
-    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
 }
 
 #searchMemos li {
@@ -292,6 +307,7 @@
     position: fixed;
     bottom: 0;
     left: 5px;
+    font-family: Arial;
 }
 
 #pictureSearchMain {
@@ -378,6 +394,13 @@
     border-style: solid;
 }
 
+#transferMenuWindows>input {
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 2px;
+}
+
 #fileNameList {
     -webkit-margin-before: 0;
     -webkit-margin-after: 0;
@@ -396,9 +419,16 @@
 
 
 
-.GroupFloatRight>* {
-    float: right;
+.GroupFloatRight {
+    display: flex;
+    justify-content: flex-end;
 }
+
+.GroupFloatRight>* {
+    align-self: center;
+}
+
+
 
 .GroupFloatLeft>* {
     float: left;
@@ -825,19 +855,3 @@
     display: flex;
     align-items: center;
 }
-
-/*
-.twitterSubBtn {
-    height: 100%;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-
-.twitterSubBtn .mybtn {
-    opacity: 0.5;
-}
-
-.twitterSubBtn .mybtn:hover {
-    opacity: 1;
-}*/
