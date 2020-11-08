@@ -358,8 +358,17 @@
 }
 
 #FolderSwitch {
+    display: flex;
     color: black;
     padding-right: 10px;
+
+}
+
+#FolderSwitch>* {
+    padding-left: 3px;
+    align-self: center;
+    line-height: 1.15;
+    font-size: 14px;
 }
 
 #resultPopupWindows {
@@ -397,8 +406,7 @@
 #transferMenuWindows>input {
     width: 100%;
     border-style: solid;
-    border-width: 1px;
-    border-radius: 2px;
+    border-width: 0px;
 }
 
 #fileNameList {
