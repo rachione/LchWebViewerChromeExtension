@@ -1,39 +1,52 @@
-(function (w) {
+(function(w) {
     const myHost = "localhost";
     const port = "7264";
 
 
-    w.py_getDestPath = function (callback) {
+    w.py_getDestPath = function(callback) {
         chrome.runtime.sendMessage({
             method: 'POST',
             action: 'fetch',
             url: `http://${myHost}:${port}/getPathList`
-        }, function (data) {
+        }, function(data) {
             console.log(data)
             callback(JSON.parse(data))
         })
     }
 
-    w.py_sendData = function (request, callback) {
+    w.py_sendData = function(request, callback) {
         chrome.runtime.sendMessage({
             method: 'POST',
             action: 'fetch',
             url: `http://${myHost}:${port}/makePicture`,
             data: request
-        }, function (data) {
+        }, function(data) {
             callback(JSON.parse(data))
 
         });
 
     }
 
-    w.py_openPathFolder = function (request) {
+    w.py_checkServer = function() {
+        var def = $.Deferred();
+        chrome.runtime.sendMessage({
+            method: 'POST',
+            action: 'fetch',
+            url: `http://${myHost}:${port}/checkServer`
+        }, function(dataTxt) {
+            def.resolve(dataTxt != null && dataTxt == "true")
+
+        });
+        return def.promise();
+    }
+
+    w.py_openPathFolder = function(request) {
         chrome.runtime.sendMessage({
             method: 'POST',
             action: 'fetch',
             url: `http://${myHost}:${port}/openPathFolder`,
             data: request
-        }, function (responseText) { });
+        }, function(responseText) {});
 
     }
 })(window);

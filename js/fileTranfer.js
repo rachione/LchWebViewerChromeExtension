@@ -703,7 +703,11 @@
         transferUI.showMenuUI();
     }
 
-    let main = function() {
+    let main = async function() {
+        let hasServer = await py_checkServer();
+        if (!hasServer) { return }
+
+
         let hostname = window.location.hostname;
         transferUI = new TransferUI();
         let extendUI = null;
