@@ -317,7 +317,7 @@
         }
 
         showResponseUI(resObj) {
-            let statusTxt = (resObj.succeed == "true") ? `transfer to ${resObj.paths} success!` : `transfer fail!`;
+            let statusTxt = (resObj.succeed == "true") ? `${resObj.paths} successfully transferred!` : `Transfer failed!`;
             let resultTxt = `${resObj.names}<br/>${statusTxt}`;
             $('#resultPopupWindows').html(resultTxt).show();
 
