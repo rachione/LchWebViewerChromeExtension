@@ -407,8 +407,10 @@
 
         update() {
             let cls = this;
-            let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
+						let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
+						
             obs.start(function() {
+								console.log($(cls.mainQuery))
                 cls.targetFunc()
             }, function($node) {
                 cls.observeFunc($node)
@@ -418,8 +420,9 @@
 
         }
         targetFunc() {
-            let cls = this;
-            cls.addDownloadBtn(cls.findImgs(cls.mainQuery));
+						let cls = this;
+						let $imgs = cls.findImgs(cls.mainQuery)
+            cls.addDownloadBtn($imgs);
         }
         observeFunc($node) {
             let cls = this;
@@ -630,7 +633,21 @@
             this.subBtnParentQuery = `div[aria-labelledby="modal-header"]`
             this.mainBtn = `<div class="twitterMainBtn"><button type="button" class=" mybtn mybtn-warning" >download</button></div>`;
             this.subBtn = `<div class="twitterSubBtn"><button type="button" class="mybtn mybtn-warning" >download</button></div>`;
-        }
+				}
+				
+				update() {
+					let cls = this;
+					let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
+					obs.start(function() {
+							console.log($(cls.mainQuery))
+							cls.targetFunc()
+					}, function($node) {
+							cls.observeFunc($(cls.mainQuery))
+
+					})
+
+
+			}
 
         collectFile(img) {
             let para = {};
@@ -649,7 +666,7 @@
             let $imgs = $(node).find(cls.imgQuery).filter(function() {
                 var imgUrl = $(this).attr('src') || $(this).find('source').attr('src');
                 return imgUrl.includes("format=") && $(this).parents(cls.vaildAreaQuery).length;
-            });
+            }).not(cls.extendedImgQuery);
 
             return $imgs;
 
