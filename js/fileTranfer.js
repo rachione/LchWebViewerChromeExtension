@@ -407,10 +407,10 @@
 
         update() {
             let cls = this;
-						let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
-						
+            let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
+
             obs.start(function() {
-								console.log($(cls.mainQuery))
+                console.log($(cls.mainQuery))
                 cls.targetFunc()
             }, function($node) {
                 cls.observeFunc($node)
@@ -420,8 +420,8 @@
 
         }
         targetFunc() {
-						let cls = this;
-						let $imgs = cls.findImgs(cls.mainQuery)
+            let cls = this;
+            let $imgs = cls.findImgs(cls.mainQuery)
             cls.addDownloadBtn($imgs);
         }
         observeFunc($node) {
@@ -633,21 +633,21 @@
             this.subBtnParentQuery = `div[aria-labelledby="modal-header"]`
             this.mainBtn = `<div class="twitterMainBtn"><button type="button" class=" mybtn mybtn-warning" >download</button></div>`;
             this.subBtn = `<div class="twitterSubBtn"><button type="button" class="mybtn mybtn-warning" >download</button></div>`;
-				}
-				
-				update() {
-					let cls = this;
-					let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
-					obs.start(function() {
-							console.log($(cls.mainQuery))
-							cls.targetFunc()
-					}, function($node) {
-							cls.observeFunc($(cls.mainQuery))
+        }
 
-					})
+        update() {
+            let cls = this;
+            let obs = new UIobserve(cls.mainQuery, cls.observeOpt)
+            obs.start(function() {
+                console.log($(cls.mainQuery))
+                cls.targetFunc()
+            }, function($node) {
+                cls.observeFunc($(cls.mainQuery))
+
+            })
 
 
-			}
+        }
 
         collectFile(img) {
             let para = {};
