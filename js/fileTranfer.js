@@ -439,11 +439,11 @@
         }
         collectFile(img) {
             let para = {};
-            let url = $(img).attr('src') || $(img).find('source').attr('src');
-
-            para.url = url
-            para.name = url.split('/').pop();
-
+            let oriUrl = $(img).attr('src') || $(img).find('source').attr('src');
+            let url = oriUrl.split("?");
+            para.url = url[0];
+            para.name = para.url.split('/').pop();
+            console.log(para)
             return para;
 
         }
@@ -458,7 +458,7 @@
                     if (event.which == 3) {
 
                         let file = [cls.collectFile(img)]
-                        cls.transferUI.setSendType(TransferType.base64)
+                        cls.transferUI.setSendType(TransferType.url)
                         cls.transferUI.setCollectedFiles(file)
                         cls.transferUI.showMenuUI();
                     }
@@ -619,6 +619,16 @@
 
     }
 
+
+
+    class LofterExtendUI extends ExtendUI {
+        constructor(transferUI) {
+            super(transferUI);
+            this.mainQuery = `.mlistcnt`;
+            this.imgQuery = `img`
+        }
+
+    }
 
     class TwitterExtendUI extends ExtendUI {
 

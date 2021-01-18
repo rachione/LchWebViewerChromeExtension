@@ -392,6 +392,7 @@ label.FolderSwitch>input {
 }
 
 #transferMenuWindows {
+    text-align: left;
     padding: 15px;
     width: 500px;
     background-color: #fff;

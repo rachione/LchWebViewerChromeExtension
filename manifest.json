@@ -15,7 +15,8 @@
     {
         "matches": [
             "https://twitter.com/*",
-            "https://www.pixiv.net/*"
+            "https://www.pixiv.net/*",
+            "https://www.lofter.com/*"
         ],
         "css": [
             "css/jquery-ui.min.css",
