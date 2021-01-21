@@ -443,7 +443,6 @@
             let url = oriUrl.split("?");
             para.url = url[0];
             para.name = para.url.split('/').pop();
-            console.log(para)
             return para;
 
         }
@@ -470,6 +469,19 @@
 
         }
     }
+
+    class OriUrlExtendUI extends ExtendUI {
+        collectFile(img) {
+            let para = {};
+            let oriUrl = $(img).attr('src') || $(img).find('source').attr('src');
+            para.url = oriUrl;
+            let url = oriUrl.split("?");
+            para.name = url[0].split('/').pop();
+            return para;
+
+        }
+    }
+
     class PixivExtendUI extends ExtendUI {
         constructor(transferUI) {
             super(transferUI);
@@ -621,14 +633,7 @@
 
 
 
-    class LofterExtendUI extends ExtendUI {
-        constructor(transferUI) {
-            super(transferUI);
-            this.mainQuery = `.mlistcnt`;
-            this.imgQuery = `img`
-        }
 
-    }
 
     class TwitterExtendUI extends ExtendUI {
 
@@ -748,6 +753,7 @@
 
                 extendUI = new PixivExtendUI(transferUI);
                 break;
+
             default:
                 extendUI = new ExtendUI(transferUI);
                 break;
